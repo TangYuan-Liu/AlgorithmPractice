@@ -1,0 +1,136 @@
+#include<iostream>
+using namespace std;
+
+struct task{
+	int po;//标记任务是提前任务还是延迟任务
+	int di;
+	int wi;
+};
+
+const int N = 7;
+
+int arry[N+1] = {0};
+
+//使用课本中的例子
+//task job[N+1] = {{0,0,0},{0,4,70},{0,2,60},{0,4,50},{0,3,40},{0,1,30},{0,4,20},{0,6,10}};
+//task job[N+1] = {{0,0,0},{0,2,60},{0,4,50},{0,3,40},{0,1,30},{0,4,20},{0,6,10},{0,4,70}};
+
+//wi(max)-wi后的例子
+task job[N+1] = {{0,0,0},{0,2,10},{0,4,20},{0,3,30},{0,1,40},{0,4,50},{0,6,60},{0,4,0}};
+int sort();
+
+int greedy();
+
+int change();
+
+int main(){
+	sort();
+	greedy();
+
+
+}
+
+
+//用于将所有提前任务置于延迟任务之前，提高鲁棒性
+int change(){
+	//用于辅助交换
+	int exchange;
+	for(int i=1;i<=N;i++){
+		if(job[arry[i]].po ==1){
+			for(int j=i-1;j>=1;j--){
+				if(job[arry[j]].po == 0){
+					exchange = arry[j];
+					arry[j] = arry[i];
+					arry[i] = exchange;
+					break;
+				}
+			}
+		}
+	}
+	return 0;
+}
+
+//本函数完成按惩罚递减排序
+int sort(){
+	//用于辅助交换
+	task exchange;
+	for(int i=1;i<=N;i++){
+		for(int j=1;j<N;j++){
+			if(job[j].wi < job[j+1].wi){
+				exchange = job[j];
+				job[j] = job[j+1];
+				job[j+1] = exchange;
+			}
+		}
+	}
+	return 0;
+}
+
+int greedy(){
+	//记录每个任务的di
+	int deadline=0;
+	int flag=0;
+	int before_job=0;
+	int exchange;
+	int punishment=0;
+	//完成提前任务子集A的统计
+	for(int i=1;i<=N;i++){
+		deadline = job[i].di;
+		//arry[deadline]从后向前遍历，查看是否有空位
+		for(int j=deadline;j>=1;j--){
+			if(arry[j] == 0){
+				arry[j] = i;
+				flag = 1;
+				job[i].po = 1;
+				break;
+			}	
+		}
+
+		//由flag判断是否已添加任务至arry[]
+		if(flag == 1){
+			flag = 0;
+			before_job++;
+			continue;
+		}
+			
+		//若未添加至arry[]，则进行贪心舍弃
+		else{
+			for(int j=N;j>deadline;j--){
+				if(arry[j] == 0){
+					arry[j] = i;
+					break;
+				}
+			}
+		}
+	}
+
+	//输出结果
+	cout << "贪心选择后的顺序："<<endl;
+	for(int i=1;i<=N;i++){
+		cout << arry[i]<<" ";
+	}
+	cout<<endl<<"规范形式的转换:"<<endl;
+	change();
+	//转换成规范形式(冒泡排序)
+	for(int j=1;j<=before_job;j++){
+		for(int i=1;i<before_job;i++){
+			if(job[arry[i]].di >=job[arry[i+1]].di){
+				exchange = arry[i];
+				arry[i] = arry[i+1];
+				arry[i+1] = exchange;
+			}
+		}
+	}
+	//输出规范形式
+	for(int i=1;i<=N;i++){
+		cout << arry[i]<<" ";
+	}
+	cout<<endl<<"放弃任务：";
+	for(int i=before_job+1;i<=N;i++){
+		cout<<arry[i]<<" ";
+		punishment = punishment+job[arry[i]].wi;
+	}
+	cout<<endl<<"总惩罚："<<punishment<<endl;
+	//cout<<before_job;
+	return 0;
+}
