@@ -1,0 +1,57 @@
+#include<iostream>
+using namespace std;
+
+int swap_mine(int *a,int *b)
+{
+	int c;
+	c = *a;
+	*a = *b;
+	*b = c;
+	return 0;
+}
+
+
+int quic_sort(int a[10],int left,int right)
+{
+	int i,j,key;
+	if(left < right)
+	{
+		key = a[left];
+		i = left;
+		j = right +1;
+		do
+		{
+			do
+			i++;
+			while(a[i] < key);
+		
+			do
+			j--;
+			while(a[j] > key);
+
+			if(i < j)
+			{
+				swap_mine(&a[i],&a[j]);
+			}
+		}
+		while(i < j);
+		swap_mine(&a[left],&a[i-1]);  //与a[j]交换也是一样的
+		quic_sort(a,left,j-1);
+		quic_sort(a,j+1,right);
+	}
+		return 0;
+}
+
+
+int main()
+{
+	int a[10] = {0};
+	cout << "快速排序" << endl;
+	cout << "Please imput 10 Nums" << endl;
+	for(int i = 0;i < 10; i++)
+		cin >> a[i];
+	quic_sort(a,0,9);
+	cout << "结果为:"<< endl;
+	for(int i = 0;i < 10; i++)
+		cout << a[i] <<" ";
+}
