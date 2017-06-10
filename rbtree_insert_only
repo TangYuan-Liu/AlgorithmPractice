@@ -1,0 +1,327 @@
+#include<iostream>
+#include<stdio.h>
+#include<windows.h>
+
+using namespace std;
+
+#define red 0
+#define black 1
+
+
+
+struct node{
+	node* parent;
+	node* left;
+	node* right;
+	int color;
+	int value;
+};
+
+//insert函数族
+void insert_case1(node* N);
+void insert_case2(node* N);
+void insert_case3(node* N);
+void insert_case4(node* N);
+void insert_case5(node* N);
+
+//定义输出时需要的几个特殊节点
+node* root;
+node* left;
+node* right;
+
+//记录插入节点数量
+int num=0;
+
+//定义插入树函数
+void insert(){
+	node* insert_fore;
+	//node* insert_behind;
+	node* new_node;
+	int value = 0;
+	if(num == 0){
+		root = new node;
+		cout<<"请输入第一个节点值："<<endl;
+		cin>>value;
+		root->value = value;
+		root->parent = NULL;
+		root->left =NULL;
+		root->right = NULL;
+		root->color = red;
+		num++;
+		new_node = root;
+	}
+	else{
+		cout<<"请输入节点值："<<endl;
+		cin>>value;
+		insert_fore=root;
+		while(insert_fore != NULL){
+			//insert_behind = insert_fore;
+			if(value > insert_fore->value){
+				if(insert_fore->right == NULL){
+					new_node = new node;
+					new_node->color = red;
+					new_node->value = value;
+					insert_fore->right = new_node;
+					new_node->parent = insert_fore;
+					new_node->left = NULL;
+					new_node->right = NULL;
+					
+					break;
+				}
+				else{
+					insert_fore = insert_fore->right;
+				}
+				
+			}
+			else{
+				if(insert_fore->left == NULL){
+					new_node = new node;
+					new_node->color = red;
+					new_node->value = value;
+					insert_fore->left = new_node;
+					new_node->parent = insert_fore;
+					new_node->left = NULL;
+					new_node->right = NULL;
+					
+					break;
+				}
+				else{
+					insert_fore = insert_fore->left;
+				}
+			}
+		}
+	}
+
+	insert_case1(new_node);
+
+}
+
+//检查节点颜色并输出
+void check_color_out(node* N){
+	if(N->color == red){
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),FOREGROUND_RED|FOREGROUND_INTENSITY);
+		cout<<N->value<<" ";
+	}
+	else{
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),FOREGROUND_BLUE|FOREGROUND_INTENSITY);
+		cout<<N->value<<" ";
+	}
+}
+
+//控制台可视化红黑树
+void out_tree(){
+	node* start = root;
+	node* left = NULL;
+	node* right = NULL;
+	if(start == root){
+		for(int i=num;i>=0;i--)
+			cout<<" ";
+		if(root->color == black){
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),FOREGROUND_BLUE|FOREGROUND_INTENSITY);
+			cout<<root->value<<endl;
+			left = root->left;
+			right = root->right;
+		}
+		else{
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),FOREGROUND_RED|FOREGROUND_INTENSITY);
+			cout<<root->value<<endl;
+			left = root->left;
+			right = root->right;
+		}
+	}
+	//如果输出的不是根节点
+	
+		for(int i=num-3;i>=0;i++){
+			cout<<" ";
+		}
+		check_color_out(left);
+		for(int i=6;i>=1;i--){
+			cout<<" ";
+		}
+		check_color_out(right);
+		cout<<endl;
+		for(int i=num-6;i>=1;i--){
+			cout<<" ";
+		}
+		check_color_out(left->left);
+		for(int i=6;i>=1;i--){
+			cout<<" ";
+		}
+		check_color_out(left->right);
+		for(int i=2;i>=1;i--){
+			cout<<" ";
+		}
+		check_color_out(right->left);
+		for(int i=6;i>=1;i--){
+			cout<<" ";
+		}
+		check_color_out(right->right);
+	
+
+
+}
+
+//先序遍历输出树的节点(递归)
+void pre_order(node* N){
+	if(N != NULL){
+		check_color_out(N);
+		if(N->left != NULL)
+			pre_order(N->left);
+		if(N->right != NULL)
+			pre_order(N->right);
+	}
+	else
+		return ;
+}
+
+//查找相关节点函数族
+node* uncle(node* N);
+node* grandpa(node* N);
+
+//旋转函数族
+void left_rotate(node* N);
+void right_rotate(node* N);
+
+
+
+int main(){
+	//将控制台改为白底黑字
+	//system("color F0"); 
+	char choice = 'y';
+	while(choice == 'y'){
+		insert();
+		cout<<"是否继续插入？(y/n)"<<endl;
+		cin>>choice;
+	}
+	cout<<"输出树的前序遍历"<<endl;
+	cout<<"*******************"<<endl;
+	pre_order(root);
+	cout<<endl;
+	//out_tree();
+	 //SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),FOREGROUND_RED|FOREGROUND_INTENSITY);
+
+
+	 
+}
+
+void left_rotate(node* N){
+	node* parent;
+	//node* child;
+	node* grandfather;
+	parent = N->parent;
+	grandfather = grandpa(N);
+
+	if(parent == grandfather->left){
+		grandfather->left = N;
+		
+	}
+	else{
+		grandfather->right = N;
+	}
+	N->left = parent;
+	parent->right = N->left;
+}
+
+void right_rotate(node* N){
+	node* parent;
+	//node* child;
+	node* grandfather;
+	parent = N->parent;
+	grandfather = grandpa(N);
+
+	if(parent == grandfather->left){
+		grandfather->left = N;
+	}
+	else{
+		grandfather->right = N;
+	}
+	N->right = parent;
+	parent->left = N->right;
+}
+
+//控制台输出函数
+void out_tree(node* N);
+
+
+
+
+//查找uncle结点的指针
+node* uncle(node* N){
+	node* grandpa;
+	node* father = NULL;
+	grandpa = N->parent->parent;
+	father = N->parent;
+	if(grandpa->right == father){
+		return(grandpa->left);
+	}
+	else
+		return(grandpa->right);
+}
+
+//查找grandpa节点
+node* grandpa(node* N){
+	return(N->parent->parent);
+}
+
+
+void insert_case1(node* N){
+
+	if(N->parent == NULL)
+		N->color = black;
+	else
+		insert_case2(N);
+}
+
+void insert_case2(node* N){
+	
+	if(N->parent->color == black)
+		return ;
+	else
+		insert_case3(N);
+}
+
+void insert_case3(node* N){
+	
+	if(uncle(N) != NULL && uncle(N)->color == red){
+		grandpa(N)->color = red;
+		N->parent->color = black;
+		uncle(N)->color = black;
+		insert_case1(grandpa(N));
+	}
+
+	else
+		insert_case4(N);
+
+}
+
+void insert_case4(node* N){
+	//如果N是其父亲F的右孩子并且F是N的祖父G的左孩子，则进行一次左旋操作
+	if(N == N->parent->right && N->parent == grandpa(N)->left){
+		left_rotate(N);
+		N = N->left;
+	}
+	//如果N是其父亲的左孩子并且其父亲是祖父的右孩子，则进行一次右旋操作
+	else if(N == N->left && N->parent == grandpa(N)->right){
+		right_rotate(N);
+		N = N->right;
+	}
+	insert_case5(N);
+}
+
+void insert_case5(node* N){
+	N->parent->color = black;
+	grandpa(N)->color = red;
+	//如果N是其父亲的左孩子并且N父亲是N祖父的左孩子
+	if(N == N->parent->left && N->parent == grandpa(N)->left)
+		right_rotate(grandpa(N));
+	else
+		left_rotate(grandpa(N));
+
+}
+
+void out_tree(node* N){
+
+
+
+
+}
