@@ -39,3 +39,19 @@ search_tree(1,0,total,count)
 
 print("Total Number is:")
 print len(count)
+
+"""
+以下是另一种表达方法：
+x是数组，v是规定的和
+def find_way(x,v):
+    l = len(x)
+    if l == 1:
+        if x[0] == v:
+            return 1
+        else:
+            return 0
+    else:
+        N1 = find_way(x[1:],v+x[0])
+        N2 = find_way(x[1:],v-x[0])
+        return N1 + N2
+"""
