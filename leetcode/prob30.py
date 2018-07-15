@@ -49,3 +49,49 @@ class Solution(object):
         
         return res
 """
+        
+"""
+后来经过看他人算法后，发现需要维护一个dict来记录某个word出现的次数，如果次数超过，则直接break即可。算法正好可以将最后一个测试用例通过。
+"""
+class Solution(object):
+    def findSubstring(self, s, words):
+        """
+        :type s: str
+        :type words: List[str]
+        :rtype: List[int]
+        """
+        
+        if not words:
+            return []
+        if not s:
+            return []
+        
+        wordsMap = {}
+        for word in words:
+            if(word not in wordsMap):
+                wordsMap[word] = 1
+            else:
+                wordsMap[word] += 1
+                
+        wordLen = len(words[0])
+        wordSize = len(words)
+        ans = []
+        
+        for i in range(len(s) - wordLen*wordSize+1):
+            j = 0
+            currDict = {}
+            while(j < wordSize):
+                word = s[i+j*wordLen: i+(j+1)*wordLen]
+                if word not in wordsMap:
+                    break
+                if word not in currDict:
+                    currDict[word] = 1
+                else:
+                    currDict[word] += 1
+                if currDict[word] > wordsMap[word]:
+                    break
+                j += 1
+            if(j == wordSize):
+                ans.append(i)
+                
+        return ans
