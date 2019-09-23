@@ -1,10 +1,11 @@
-# Algorithms Summary
+# Algorithms Summary--Sequence
 
 ### 1. 获取某些特定值倍数的有序数列
 * 丑数（只包含2,3,5质因子的数[1,2,3,4,5,6,8,9,10...], **特例是1，也属于丑数**）
 
 #### Solution：三指针
-<pre></code>
+<pre><code>
+# Example: leetcode 264
 class Solution(object):
     def nthUglyNumber(self, n):
         if not n:
